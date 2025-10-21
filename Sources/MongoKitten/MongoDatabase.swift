@@ -376,6 +376,23 @@ public class MongoDatabase: @unchecked Sendable {
             )
         }
     }
+    
+    public func createCollection(named name: String) async throws -> MongoServerReply {
+        guard transaction == nil else {
+            throw MongoKittenError(.unsupportedFeatureByServer, reason: .transactionForUnsupportedQuery)
+        }
+        
+        let connection = try await pool.next(for: .writable)
+        let reply = try await connection.executeEncodable(
+            CreateCollectionCommand(named: name),
+            namespace: self.commandNamespace,
+            in: self.transaction,
+            sessionId: connection.implicitSessionId,
+            logMetadata: logMetadata
+        )
+        
+        return reply
+    }
 }
 
 extension EventLoopFuture where Value: Sendable {

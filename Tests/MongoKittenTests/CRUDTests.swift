@@ -452,6 +452,11 @@ class CrudTests : XCTestCase {
         XCTAssertTrue(collectionNames.contains(DummyAccount.collectionName))
     }
     
+    func testCreateCollection() async throws {
+        let reply = try await mongo.createCollection(named: DummyAccount.collectionName)
+        XCTAssert(try reply.isOK())
+    }
+    
     func testRenameCollection() async throws {
         try await testCreateDummyAccount()
         let schema = mongo[DummyAccount.collectionName]
