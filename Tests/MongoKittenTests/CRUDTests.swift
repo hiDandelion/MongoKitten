@@ -452,6 +452,13 @@ class CrudTests : XCTestCase {
         XCTAssertTrue(collectionNames.contains(DummyAccount.collectionName))
     }
     
+    func testRenameCollection() async throws {
+        try await testCreateDummyAccount()
+        let schema = mongo[DummyAccount.collectionName]
+        let reply = try await schema.rename(to: "\(DummyAccount.collectionName)Renamed")
+        XCTAssert(try reply.isOK())
+    }
+    
     func testFailedConnection() async throws {
         let badSettings = try ConnectionSettings("mongodb+srv://AMTester:Autimatisering1@0.0.0.0/\(dbName)?retryWrites=true&w=majority")
         do {

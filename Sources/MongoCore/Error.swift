@@ -103,6 +103,7 @@ internal struct MongoOptionalUnwrapFailure: Error, CustomStringConvertible {
 public struct MongoError: Error, CustomStringConvertible, CustomDebugStringConvertible {
     public enum Kind: String, Codable, CustomStringConvertible, Equatable, Sendable {
         case authenticationFailure
+        case requireAdminAccess
         case cannotGetMore
         case cannotConnect
         case invalidResponse
@@ -112,11 +113,12 @@ public struct MongoError: Error, CustomStringConvertible, CustomDebugStringConve
 
         public var description: String {
             switch self {
-            case .cannotGetMore: return "Unable to get more results from the cursor"
             case .authenticationFailure: return "Authentication to MongoDB failed"
+            case .requireAdminAccess: return "Require administrator access"
+            case .cannotGetMore: return "Unable to get more results from the cursor"
+            case .cannotConnect: return "No hosts could be connected with, therefore no queries can be sent at the moment"
             case .invalidResponse: return "The response contained unexpected or no data"
             case .cannotCloseCursor: return "Unable to close the cursor"
-            case .cannotConnect: return "No hosts could be connected with, therefore no queries can be sent at the moment"
             case .queryFailure: return "The query sent failed"
             case .queryTimeout: return "The query timed out"
             }

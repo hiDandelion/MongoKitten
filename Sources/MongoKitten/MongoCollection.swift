@@ -138,6 +138,23 @@ public final class MongoCollection: Sendable {
         self.session = session
     }
     
+    public func rename(to name: String) async throws -> MongoServerReply {
+        let databases = try await database.pool.listDatabases()
+        guard let database = databases.first(where: { $0.name == "admin" }) else {
+            throw MongoError(.requireAdminAccess, reason: nil)
+        }
+        let connection = try await database.pool.next(for: .writable)
+        let reply = try await connection.executeEncodable(
+            RenameCollectionCommand(from: self.name, to: name, inDatabase: self.database.name),
+            namespace: database.commandNamespace,
+            in: database.transaction,
+            sessionId: connection.implicitSessionId,
+            logMetadata: database.logMetadata
+        )
+        
+        return reply
+    }
+    
     /// Drops this collection and all its indexes
     ///
     /// This operation cannot be undone. Use with caution.
